@@ -66,6 +66,7 @@ class PartyPanel extends PluginPanel
 	private Long draggedMember;
 	private Point dragOrigin;
 	private boolean dragStarted;
+	private boolean pressedOnBanner;
 	private final JPanel passphrasePanel = new JPanel();
 	private final JLabel passphraseLabel = new JLabel();
 	@Getter
@@ -136,6 +137,7 @@ class PartyPanel extends PluginPanel
 		draggedMember = null;
 		dragOrigin = null;
 		dragStarted = false;
+		pressedOnBanner = false;
 
 		basePanel.revalidate();
 		basePanel.repaint();
@@ -200,6 +202,7 @@ class PartyPanel extends PluginPanel
 					draggedMember = null;
 					dragOrigin = null;
 					dragStarted = false;
+					pressedOnBanner = false;
 				}
 				playerOrder.reconcile(playerPanelMap.keySet());
 				refreshPlayerOrder();
@@ -243,6 +246,7 @@ class PartyPanel extends PluginPanel
 					draggedMember = memberId;
 					dragOrigin = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), basePanel);
 					dragStarted = false;
+					pressedOnBanner = SwingUtilities.isDescendingFrom(event.getComponent(), panel.getBanner());
 				}
 			}
 
@@ -297,9 +301,16 @@ class PartyPanel extends PluginPanel
 			{
 				if (draggedMember != null && draggedMember == memberId)
 				{
+				final Point released = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), basePanel);
+				final boolean toggle = pressedOnBanner && !dragStarted && CardDragListener.isClick(dragOrigin, released);
 					draggedMember = null;
 					dragOrigin = null;
 					dragStarted = false;
+					pressedOnBanner = false;
+					if (toggle)
+					{
+						panel.toggleExpanded();
+					}
 				}
 			}
 		};

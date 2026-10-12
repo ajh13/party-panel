@@ -50,7 +50,6 @@ import thestonedturtle.partypanel.ui.prayer.PrayerSlot;
 import thestonedturtle.partypanel.ui.skills.PlayerSkillsPanel;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -59,7 +58,6 @@ import javax.swing.border.MatteBorder;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -115,10 +113,8 @@ public class PlayerPanel extends JPanel
 		this.skillsPanel = new PlayerSkillsPanel(selectedPlayer, config.displayVirtualLevels(), spriteManager);
 		this.prayersPanel = new PlayerPrayerPanel(selectedPlayer, spriteManager);
 
-		// Non-optimal way to attach a mouse listener to
-		// the entire panel, but easy to implement
+		// Keep hover feedback on the banner and stat boxes.
 		JPanel statsPanel = this.banner.getStatsPanel();
-		JLabel expandIcon = this.banner.getExpandIcon();
 		Component[] list = new Component[statsPanel.getComponentCount() + 1];
 		System.arraycopy(statsPanel.getComponents(), 0, list, 0, list.length - 1);
 		list[list.length - 1] = banner;
@@ -127,43 +123,8 @@ public class PlayerPanel extends JPanel
 		{
 			if (comp instanceof JPanel)
 			{
-				MouseAdapter bannerClick = new MouseAdapter()
+				comp.addMouseListener(new MouseAdapter()
 				{
-					private Point pressPoint;
-					private boolean dragged;
-
-					@Override
-					public void mousePressed(MouseEvent e)
-					{
-						if (e.getButton() == MouseEvent.BUTTON1)
-						{
-							pressPoint = SwingUtilities.convertPoint(comp, e.getPoint(), banner);
-							dragged = false;
-						}
-					}
-
-					@Override
-					public void mouseDragged(MouseEvent e)
-					{
-						dragged |= !CardDragListener.isClick(pressPoint, SwingUtilities.convertPoint(comp, e.getPoint(), banner));
-					}
-
-					@Override
-					public void mouseReleased(MouseEvent e)
-					{
-						final Point released = SwingUtilities.convertPoint(comp, e.getPoint(), banner);
-						if (e.getButton() == MouseEvent.BUTTON1 && !dragged && CardDragListener.isClick(pressPoint, released))
-						{
-							ImageIcon retrieve = (ImageIcon) expandIcon.getIcon();
-							BufferedImage buffered = (BufferedImage) retrieve.getImage();
-
-							showInfo = !showInfo;
-							expandIcon.setIcon(new ImageIcon(ImageUtil.rotateImage(buffered, Math.PI)));
-							updatePanel();
-						}
-						pressPoint = null;
-					}
-
 					@Override
 					public void mouseEntered(MouseEvent e)
 					{
@@ -177,9 +138,7 @@ public class PlayerPanel extends JPanel
 						banner.setBackground(BACKGROUND_COLOR);
 						statsPanel.setBackground(BACKGROUND_COLOR);
 					}
-				};
-				comp.addMouseListener(bannerClick);
-				comp.addMouseMotionListener(bannerClick);
+				});
 			}
 		}
 
@@ -187,6 +146,13 @@ public class PlayerPanel extends JPanel
 
 		revalidate();
 		repaint();
+	}
+
+	public void toggleExpanded()
+	{
+		showInfo = !showInfo;
+		banner.setExpandIcon(showInfo);
+		updatePanel();
 	}
 
 	private void addTab(final MaterialTabGroup tabGroup, final int spriteID, final JPanel panel, final String tooltip)
