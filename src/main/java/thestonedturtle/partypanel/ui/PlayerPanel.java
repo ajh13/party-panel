@@ -101,7 +101,7 @@ public class PlayerPanel extends JPanel
 	private final Map<Integer, Boolean> tabMap = new HashMap<>();
 
 	public PlayerPanel(final PartyPlayer selectedPlayer, final PartyPanelConfig config,
-					   final SpriteManager spriteManager, final ItemManager itemManager)
+						final SpriteManager spriteManager, final ItemManager itemManager)
 	{
 		this.player = selectedPlayer;
 		this.config = config;
