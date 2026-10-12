@@ -59,6 +59,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -126,12 +127,32 @@ public class PlayerPanel extends JPanel
 		{
 			if (comp instanceof JPanel)
 			{
-				comp.addMouseListener(new MouseAdapter()
+				MouseAdapter bannerClick = new MouseAdapter()
 				{
+					private Point pressPoint;
+					private boolean dragged;
+
 					@Override
 					public void mousePressed(MouseEvent e)
 					{
 						if (e.getButton() == MouseEvent.BUTTON1)
+						{
+							pressPoint = SwingUtilities.convertPoint(comp, e.getPoint(), banner);
+							dragged = false;
+						}
+					}
+
+					@Override
+					public void mouseDragged(MouseEvent e)
+					{
+						dragged |= !CardDragListener.isClick(pressPoint, SwingUtilities.convertPoint(comp, e.getPoint(), banner));
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent e)
+					{
+						final Point released = SwingUtilities.convertPoint(comp, e.getPoint(), banner);
+						if (e.getButton() == MouseEvent.BUTTON1 && !dragged && CardDragListener.isClick(pressPoint, released))
 						{
 							ImageIcon retrieve = (ImageIcon) expandIcon.getIcon();
 							BufferedImage buffered = (BufferedImage) retrieve.getImage();
@@ -140,6 +161,7 @@ public class PlayerPanel extends JPanel
 							expandIcon.setIcon(new ImageIcon(ImageUtil.rotateImage(buffered, Math.PI)));
 							updatePanel();
 						}
+						pressPoint = null;
 					}
 
 					@Override
@@ -155,7 +177,9 @@ public class PlayerPanel extends JPanel
 						banner.setBackground(BACKGROUND_COLOR);
 						statsPanel.setBackground(BACKGROUND_COLOR);
 					}
-				});
+				};
+				comp.addMouseListener(bannerClick);
+				comp.addMouseMotionListener(bannerClick);
 			}
 		}
 

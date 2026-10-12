@@ -51,6 +51,7 @@ import lombok.Getter;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.PluginPanel;
 import thestonedturtle.partypanel.data.PartyPlayer;
+import thestonedturtle.partypanel.ui.CardDragListener;
 import thestonedturtle.partypanel.ui.ControlsPanel;
 import thestonedturtle.partypanel.ui.PlayerPanel;
 
@@ -182,7 +183,7 @@ class PartyPanel extends PluginPanel
 		panel = new PlayerPanel(player, plugin.getConfig(), plugin.spriteManager, plugin.itemManager);
 		playerPanelMap.put(player.getMember().getMemberId(), panel);
 		panel.updatePlayerData(player, hasBreakingBannerChange);
-		installDragHandle(panel, player.getMember().getMemberId());
+		installCardDrag(panel, player.getMember().getMemberId());
 		playerOrder.reconcile(playerPanelMap.keySet());
 		refreshPlayerOrder();
 	}
@@ -230,10 +231,8 @@ class PartyPanel extends PluginPanel
 		basePanel.repaint();
 	}
 
-	private void installDragHandle(PlayerPanel panel, long memberId)
+	private void installCardDrag(PlayerPanel panel, long memberId)
 	{
-		final JLabel handle = panel.getBanner().getDragHandle();
-		final Color normalColor = handle.getForeground();
 		final MouseAdapter drag = new MouseAdapter()
 		{
 			@Override
@@ -242,7 +241,7 @@ class PartyPanel extends PluginPanel
 				if (SwingUtilities.isLeftMouseButton(event))
 				{
 					draggedMember = memberId;
-					dragOrigin = SwingUtilities.convertPoint(handle, event.getPoint(), basePanel);
+					dragOrigin = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), basePanel);
 					dragStarted = false;
 				}
 			}
@@ -255,17 +254,16 @@ class PartyPanel extends PluginPanel
 					return;
 				}
 
-				final Point point = SwingUtilities.convertPoint(handle, event.getPoint(), basePanel);
+				final Point point = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), basePanel);
 				if (!dragStarted)
 				{
-					if (dragOrigin == null || dragOrigin.distance(point) < 6)
+					if (CardDragListener.isClick(dragOrigin, point))
 					{
 						return;
 					}
 					dragStarted = true;
-					handle.setForeground(Color.WHITE);
 				}
-				final int scrollY = SwingUtilities.convertPoint(handle, event.getPoint(), scrollPane.getViewport()).y;
+				final int scrollY = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), scrollPane.getViewport()).y;
 				if (scrollY < 24)
 				{
 					scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() - 12);
@@ -302,12 +300,10 @@ class PartyPanel extends PluginPanel
 					draggedMember = null;
 					dragOrigin = null;
 					dragStarted = false;
-					handle.setForeground(normalColor);
 				}
 			}
 		};
-		handle.addMouseListener(drag);
-		handle.addMouseMotionListener(drag);
+		new CardDragListener(panel, drag::mousePressed, drag::mouseDragged, drag::mouseReleased);
 	}
 
 	void updatePartyMembersExpand(boolean expand)

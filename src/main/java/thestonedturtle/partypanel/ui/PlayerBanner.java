@@ -44,8 +44,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -70,8 +68,6 @@ public class PlayerBanner extends JPanel
 	private final Map<String, JLabel> iconLabels = new HashMap<>();
 	@Getter
 	private final JLabel expandIcon = new JLabel();
-	@Getter
-	private final JLabel dragHandle = new JLabel("\u2630");
 	private final JLabel worldLabel = new JLabel();
 	private final JLabel spellbookIcon = new JLabel();
 
@@ -101,12 +97,6 @@ public class PlayerBanner extends JPanel
 		statsPanel.setOpaque(true);
 
 		expandIconDown = new ImageIcon(EXPAND_ICON);
-		dragHandle.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-		dragHandle.setToolTipText("Drag to reorder party members");
-		dragHandle.setBorder(new EmptyBorder(0, 4, 0, 8));
-		dragHandle.setPreferredSize(new Dimension(24, 24));
-		dragHandle.setHorizontalAlignment(JLabel.CENTER);
-		dragHandle.setForeground(Color.LIGHT_GRAY);
 		expandIconUp = new ImageIcon(ImageUtil.rotateImage(EXPAND_ICON, Math.PI));
 		if (expanded)
 		{
@@ -205,11 +195,7 @@ public class PlayerBanner extends JPanel
 		final JPanel topRow = new JPanel(new BorderLayout());
 		topRow.setOpaque(false);
 		topRow.add(usernameLabel, BorderLayout.WEST);
-		final JPanel actions = new JPanel(new BorderLayout());
-		actions.setOpaque(false);
-		actions.add(dragHandle, BorderLayout.WEST);
-		actions.add(expandIcon, BorderLayout.EAST);
-		topRow.add(actions, BorderLayout.EAST);
+		topRow.add(expandIcon, BorderLayout.EAST);
 
 		final JPanel bottomRow = new JPanel(new BorderLayout());
 		bottomRow.setOpaque(false);
