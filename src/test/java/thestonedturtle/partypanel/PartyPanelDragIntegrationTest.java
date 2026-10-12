@@ -69,6 +69,7 @@ public class PartyPanelDragIntegrationTest
 			int collapsedHeight = first.getHeight();
 			click(robot, point);
 			assertTrue(first.isShowInfo());
+			assertFalse(first.isDragging());
 			assertTrue("Expanded card should become taller", first.getHeight() > collapsedHeight);
 			click(robot, point);
 			assertFalse(first.isShowInfo());
@@ -94,12 +95,16 @@ public class PartyPanelDragIntegrationTest
 			Point destination = destinationRef.get();
 			robot.mouseMove(point.x, point.y);
 			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+			robot.mouseMove(point.x, point.y + 10);
+			robot.waitForIdle();
+			assertTrue("Dragged card should be highlighted after the movement threshold", first.isDragging());
 			for (int y = point.y; y <= destination.y; y += 5)
 			{
 				robot.mouseMove(destination.x, y);
 			}
 			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			robot.waitForIdle();
+			assertFalse("Highlight should clear on release", first.isDragging());
 			assertEquals(second, first.getParent().getComponent(0));
 
 			// An expanded card must also be draggable from its content, while a

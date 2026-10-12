@@ -55,9 +55,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -70,6 +73,7 @@ public class PlayerPanel extends JPanel
 	private static final Dimension IMAGE_SIZE = new Dimension(24, 24);
 	private static final Color BACKGROUND_COLOR = ColorScheme.DARK_GRAY_COLOR;
 	private static final Color BACKGROUND_HOVER_COLOR = ColorScheme.DARKER_GRAY_COLOR;
+	private static final Color DRAG_HIGHLIGHT_COLOR = new Color(255, 183, 77);
 
 	private static final int VENOM_THRESHOLD = 1000000;
 	private static final BufferedImage HEART_DISEASE;
@@ -97,6 +101,7 @@ public class PlayerPanel extends JPanel
 
 	@Setter
 	private boolean showInfo;
+	private boolean dragging;
 	private final Map<Integer, Boolean> tabMap = new HashMap<>();
 
 	public PlayerPanel(final PartyPlayer selectedPlayer, final PartyPanelConfig config,
@@ -153,6 +158,29 @@ public class PlayerPanel extends JPanel
 		showInfo = !showInfo;
 		banner.setExpandIcon(showInfo);
 		updatePanel();
+	}
+
+	public void setDragging(boolean dragging)
+	{
+		if (this.dragging != dragging)
+		{
+			this.dragging = dragging;
+			repaint();
+		}
+	}
+
+	@Override
+	public void paint(Graphics graphics)
+	{
+		super.paint(graphics);
+		if (dragging)
+		{
+			Graphics2D outline = (Graphics2D) graphics.create();
+			outline.setColor(DRAG_HIGHLIGHT_COLOR);
+			outline.setStroke(new BasicStroke(3));
+			outline.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
+			outline.dispose();
+		}
 	}
 
 	private void addTab(final MaterialTabGroup tabGroup, final int spriteID, final JPanel panel, final String tooltip)

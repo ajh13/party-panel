@@ -131,6 +131,7 @@ class PartyPanel extends PluginPanel
 
 	void clearSidebar()
 	{
+		playerPanelMap.values().forEach(p -> p.setDragging(false));
 		basePanel.removeAll();
 		playerPanelMap.clear();
 		playerOrder.reconcile(playerPanelMap.keySet());
@@ -197,6 +198,7 @@ class PartyPanel extends PluginPanel
 			final PlayerPanel p = playerPanelMap.remove(player.getMember().getMemberId());
 			if (p != null)
 			{
+				p.setDragging(false);
 				if (draggedMember != null && draggedMember == player.getMember().getMemberId())
 				{
 					draggedMember = null;
@@ -243,6 +245,14 @@ class PartyPanel extends PluginPanel
 			{
 				if (SwingUtilities.isLeftMouseButton(event))
 				{
+				if (draggedMember != null)
+				{
+					PlayerPanel previous = playerPanelMap.get(draggedMember);
+					if (previous != null)
+					{
+						previous.setDragging(false);
+					}
+				}
 					draggedMember = memberId;
 					dragOrigin = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), basePanel);
 					dragStarted = false;
@@ -266,6 +276,7 @@ class PartyPanel extends PluginPanel
 						return;
 					}
 					dragStarted = true;
+					panel.setDragging(true);
 				}
 				final int scrollY = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), scrollPane.getViewport()).y;
 				if (scrollY < 24)
@@ -303,6 +314,7 @@ class PartyPanel extends PluginPanel
 				{
 				final Point released = SwingUtilities.convertPoint(event.getComponent(), event.getPoint(), basePanel);
 				final boolean toggle = pressedOnBanner && !dragStarted && CardDragListener.isClick(dragOrigin, released);
+				panel.setDragging(false);
 					draggedMember = null;
 					dragOrigin = null;
 					dragStarted = false;
