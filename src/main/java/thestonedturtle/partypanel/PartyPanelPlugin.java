@@ -145,6 +145,7 @@ public class PartyPanelPlugin extends Plugin
 
 	private PartyPanel panel;
 	private Instant lastLogout;
+	private boolean autoJoinAttempted;
 
 	// All events should be deferred to the next game tick
 	private PartyBatchedChange currentChange = new PartyBatchedChange();
@@ -179,6 +180,10 @@ public class PartyPanelPlugin extends Plugin
 		}
 
 		lastLogout = Instant.now();
+		if (client.getGameState() == GameState.LOGGED_IN)
+		{
+			attemptAutoJoin();
+		}
 		overlayManager.add(partyReminderOverlay);
 	}
 
@@ -203,6 +208,7 @@ public class PartyPanelPlugin extends Plugin
 		currentChange = new PartyBatchedChange();
 		panel.getPlayerPanelMap().clear();
 		lastLogout = null;
+		autoJoinAttempted = false;
 		overlayManager.remove(partyReminderOverlay);
 	}
 
@@ -252,6 +258,15 @@ public class PartyPanelPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged c)
 	{
+		if (c.getGameState() == GameState.LOGIN_SCREEN)
+		{
+			autoJoinAttempted = false;
+		}
+		else if (c.getGameState() == GameState.LOGGED_IN)
+		{
+			attemptAutoJoin();
+		}
+
 		if (!isInParty())
 		{
 			return;
@@ -295,6 +310,31 @@ public class PartyPanelPlugin extends Plugin
 			partyService.send(currentChange);
 			currentChange = new PartyBatchedChange();
 		}
+	}
+
+	private void attemptAutoJoin()
+	{
+		if (autoJoinAttempted || !config.autoJoinParty() || partyService.isInParty())
+		{
+			return;
+		}
+
+		// Do not retry on subsequent LOGGED_IN events or after a manual leave.
+		autoJoinAttempted = true;
+		final String configured = config.autoJoinPartyPassphrase();
+		if (configured == null || configured.trim().isEmpty())
+		{
+			return;
+		}
+
+		final String passphrase = configured.trim().replace(' ', '-');
+		if (!passphrase.matches("[A-Za-z0-9-]+"))
+		{
+			log.warn("Invalid auto-join party passphrase; expected letters, numbers or hyphens");
+			return;
+		}
+
+		partyService.changeParty(passphrase);
 	}
 
 	public boolean isInParty()
