@@ -10,7 +10,7 @@ import net.runelite.client.party.PartyService;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -36,24 +36,23 @@ public class PartyPanelAutoJoinTest
 	}
 
 	@Test
-	public void autoJoinIsOptIn() throws Exception
+	public void emptyPassphraseDisablesAutoJoin() throws Exception
 	{
-		assertFalse(new PartyPanelConfig()
+		assertEquals("", new PartyPanelConfig()
 		{
 			@Override
 			public void setPreviousPartyId(String id)
 			{
 			}
-		}.autoJoinParty());
-		when(config.autoJoinPartyPassphrase()).thenReturn("friends");
+		}.autoJoinPartyPassphrase());
+		when(config.autoJoinPartyPassphrase()).thenReturn("");
 		login();
-		verify(partyService, never()).changeParty("friends");
+		verify(partyService, never()).changeParty(org.mockito.ArgumentMatchers.anyString());
 	}
 
 	@Test
 	public void joinsConfiguredPartyOnceOnLogin() throws Exception
 	{
-		when(config.autoJoinParty()).thenReturn(true);
 		when(config.autoJoinPartyPassphrase()).thenReturn("  My Friends  ");
 		login();
 		login();
@@ -63,7 +62,6 @@ public class PartyPanelAutoJoinTest
 	@Test
 	public void skipsEmptyAndInvalidPassphrases() throws Exception
 	{
-		when(config.autoJoinParty()).thenReturn(true);
 		when(config.autoJoinPartyPassphrase()).thenReturn("  ", "bad!party");
 		login();
 		loginScreen();
@@ -74,7 +72,6 @@ public class PartyPanelAutoJoinTest
 	@Test
 	public void doesNotReplaceExistingParty() throws Exception
 	{
-		when(config.autoJoinParty()).thenReturn(true);
 		when(config.autoJoinPartyPassphrase()).thenReturn("friends");
 		when(partyService.isInParty()).thenReturn(true);
 		when(partyService.getLocalMember()).thenReturn(mock(PartyMember.class));
@@ -85,7 +82,6 @@ public class PartyPanelAutoJoinTest
 	@Test
 	public void manualLeaveDoesNotRejoinUntilNextLogin() throws Exception
 	{
-		when(config.autoJoinParty()).thenReturn(true);
 		when(config.autoJoinPartyPassphrase()).thenReturn("friends");
 		login();
 		plugin.leaveParty();

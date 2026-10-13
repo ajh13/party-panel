@@ -314,7 +314,7 @@ public class PartyPanelPlugin extends Plugin
 
 	private void attemptAutoJoin()
 	{
-		if (autoJoinAttempted || !config.autoJoinParty() || partyService.isInParty())
+		if (autoJoinAttempted || partyService.isInParty())
 		{
 			return;
 		}

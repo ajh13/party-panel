@@ -14,10 +14,9 @@ the RuneLite Party Plugin to remove the in-game overlays if you just want to use
 To learn more about joining a party please read
 the [RuneLite Wiki Page](https://github.com/runelite/runelite/wiki/Party#how-to-create-a-party) about this.
 
-To join a specific party automatically when logging into the game, open **Hub Party Panel** settings, enter its
-**Auto-join party passphrase**, then enable **Auto-join party on login**. This is off by default; it will not replace
-an existing party. Spaces in the passphrase become hyphens. Leaving a party manually will not rejoin it until the
-next login.
+To join a specific party automatically when logging into the game, open **Hub Party Panel** settings and enter its
+**Auto-join party passphrase**. Leave it empty to disable auto-join (the default); it will not replace an existing
+party. Spaces in the passphrase become hyphens. Leaving a party manually will not rejoin it until the next login.
 
 # UI Examples
 

@@ -85,21 +85,10 @@ public interface PartyPanelConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "autoJoinParty",
-			name = "Auto-join party on login",
-			description = "Join the configured party when logging in, if not already in a party (off by default)",
-			position = 6
-	)
-	default boolean autoJoinParty()
-	{
-		return false;
-	}
-
-	@ConfigItem(
 			keyName = "autoJoinPartyPassphrase",
 			name = "Auto-join party passphrase",
-			description = "Party passphrase to join on login when auto-join is enabled (letters, numbers and hyphens)",
-			position = 7
+			description = "Join this party on login if not already in a party; leave blank to disable (letters, numbers and hyphens)",
+			position = 6
 	)
 	default String autoJoinPartyPassphrase()
 	{
