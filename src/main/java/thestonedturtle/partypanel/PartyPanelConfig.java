@@ -84,6 +84,17 @@ public interface PartyPanelConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(
+			keyName = "autoJoinPartyPassphrase",
+			name = "Auto-join party passphrase",
+			description = "Join this party on login if not already in a party; leave blank to disable (letters, numbers and hyphens)",
+			position = 6
+	)
+	default String autoJoinPartyPassphrase()
+	{
+		return "";
+	}
+
 
 	@ConfigItem(
 			keyName = "previousPartyId",
